@@ -1,25 +1,52 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Fragment, useState, useEffect } from "react";
+import Formulario from "./components/Formulario";
+import Cita from "./components/Cita";
 
 function App() {
+  let citasIniciales = JSON.parse(localStorage.getItem("citas"));
+  if (!citasIniciales) {
+    citasIniciales = [];
+  }
+
+  const [citas, guardarCitas] = useState(citasIniciales);
+
+  useEffect(() => {
+    let citasIniciales = JSON.parse(localStorage.getItem("citas"));
+    if (citasIniciales) {
+      localStorage.setItem("citas", JSON.stringify(citas));
+    } else {
+      localStorage.setItem("citas", JSON.stringify([]));
+    }
+    console.log("Document is ready or something happen with the Dates");
+  }, [citas]);
+
+  const crearCita = cita => {
+    guardarCitas([...citas, cita]);
+  };
+  const eliminarCita = id => {
+    const nuevasCitas = citas.filter(cita => cita.id !== id);
+    guardarCitas(nuevasCitas);
+  };
+  const title = citas.length === 0 ? "No Dates" : "Manage your Dates";
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Fragment>
+      <h1>appointment manager</h1>;
+      <div className="container">
+        <div className="row">
+          <div className="one-half column">
+            <Formulario crearCita={crearCita} />
+          </div>
+          <div className="one-half column">
+            <h2>{title}</h2>
+
+            {citas.map(cita => (
+              <Cita cita={cita} key={cita.id} eliminarCita={eliminarCita} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </Fragment>
   );
 }
 
